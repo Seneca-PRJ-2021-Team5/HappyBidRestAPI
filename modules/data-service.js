@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 
 const chalk = require('chalk'); // to style console.log texts
-const keys = require("./keys.js");
+//const keys = require("./keys.js");
 const bcrypt = require('bcryptjs');
 
 const User = require("../Models/userSchema");
