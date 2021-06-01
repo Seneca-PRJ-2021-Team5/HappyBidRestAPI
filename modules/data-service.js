@@ -74,7 +74,7 @@ const getSpecificUser =(req, res)=>
                 res.json({message:`USER LOGED IN SUCCESSFULLY !`})
             }
             else{
-                res.json({message:`ERROR: ${err} !`});
+                res.json({message:`ERROR: USER COULD NOT LOGIN!!`});
             }
             
         })
