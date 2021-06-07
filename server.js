@@ -15,10 +15,14 @@ app.get("/",(req,res)=>{
 })
 
 // API ROUTES
-// POST /api/users
-app.post("/api/users", (req,res)=>{
+// POST /api/user
+app.post("/api/user", (req,res)=>{
 
     dataService.addNewUser(req.body, res)
+});
+
+app.post("/api/auction", (req,res) => {
+    dataService.addNewAuction(req.body, res)
 });
 
 
@@ -31,6 +35,11 @@ app.get("/api/users", (req,res)=>{
 // GET /api/users GET A SPECIFIC USER
 app.get("/api/user", (req,res)=>{
     dataService.getSpecificUser(req,res)
+});
+
+//get autions
+app.get("/api/auctions", (req, res) => {
+    dataService.getAllAuctions(req, res)
 });
 
 
