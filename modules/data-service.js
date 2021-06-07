@@ -154,6 +154,7 @@ const addNewAuction = (data,res) => {
     })
 }
 
+
 module.exports = {
     initialize: initialize,
     addNewUser: addNewUser,
