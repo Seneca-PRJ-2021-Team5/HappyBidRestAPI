@@ -8,6 +8,10 @@ const dataService = require("./modules/data-service.js");
 
 
 const app = express();
+
+const httpServer = require("http").createServer(app);
+const io = require("socket.io")(httpServer);
+
 app.use(cors());
 app.use(bodyParser.json()); 
 
@@ -18,6 +22,27 @@ app.use(clientSessions({
     duration: 2 * 60 * 1000,    // duration of the session in milliseconds (2 minutes)
     activeDuration: 1000 * 60   // the session will be extended by this many ms each request (1 minute)
 }));
+
+io.on("connection", socket => { 
+    console.log("new client connected!")
+
+    socket.on('sendMessage', (message, callback) => {
+        //io.emit('message', { text: message });
+
+        currentDate = new Date();
+        console.log(currentDate);
+        io.emit('message', 
+        {
+            position: 'left', 
+            title: 'User', 
+            type: 'text', 
+            text: message, 
+            date: currentDate
+        });
+        callback();
+    });
+
+});
 
 // Helper function to ensure that the user is logged in
 function ensureLogin(req, res, next) {
@@ -68,6 +93,10 @@ app.get("/api/auctions", (req, res) => {
 app.get("/api/user/profile", (req, res) => {
     dataService.getSpecificUserWithDetails(req, res);
 });
+
+app.post("/api/user/creditcard", (req, res) => {
+    dataService.addCreditCard(req.body, res);
+})
 
 // ------------------- CONNECTIVITY PART
 //
