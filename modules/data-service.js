@@ -265,27 +265,53 @@ const auctionAddToUSerList = (req, res) => {
    Auction.findOne({_id: req.query.id})
    .then( auction => {
        User.findOne({emailAddress: req.query.emailAddress})
-       .then(user => {
-           
+       .then(user => 
+        {
+           let hasUser = false
+           let hasAuction = false
+
            //add data from user to auction object 
-           auction.userList.push({
-               userName: user.userName, 
-               emailAddress: user.emailAddress})
+           for(let i = 0; i < auction.userList.length && !hasUser; i++)
+           {
+                if(auction.userList[i].emailAddress == user.emailAddress){
+                    hasUser = true
+                }
+           }
+
+           for(let i = 0; i < user.manageAuction.length && !hasAuction; i++)
+           {
+                if(user.manageAuction[i].auctionId == auction._id){
+                    hasAuction = true
+                }
+           }
+
+           if(!hasUser)
+           {
+               auction.userList.push({
+                  userName: user.userName, 
+                  emailAddress: user.emailAddress
+               })
+               
+               user.save()
+               .then(()=> console.log("success"))
+               .catch(err=>console.log(`ERROR: Did not succeded: ${err}`));
+           }
         
-           //add data from auction to user object 
-           user.manageAuction.push({
-               auctionName: auction.title,
-               productName: auction.product.name,
-               auctionStatus: auction.status
-            })
+           if(!hasAuction)
+           {
+                //add data from auction to user object 
+                user.manageAuction.push({
+                    auctionId: auction._id,
+                    auctionName: auction.title,
+                    productName: auction.product.name,
+                    auctionStatus: auction.status
+                })
 
-            auction.save()
-            .then(()=> console.log("success"))
-            .catch(err=>console.log(`ERROR: Did not succeded: ${err}`));
+                auction.save()
+                .then(()=> console.log("success"))
+                .catch(err=>console.log(`ERROR: Did not succeded: ${err}`));
+            }
 
-            user.save()
-            .then(()=> console.log("success"))
-            .catch(err=>console.log(`ERROR: Did not succeded: ${err}`));
            res.json({auction: auction, user: user})
        })
        .catch(err=>console.log(`ERROR: Could not find user: ${err}`));
