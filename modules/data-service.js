@@ -76,7 +76,7 @@ const addNewUser = (data, res)=> {
             res.json({message:`EMAIL ALREADY REGISTERED`})
         }
     })
- 
+    
 }
 
 
@@ -116,11 +116,11 @@ const getSpecificUser =(req, res)=>
                 .catch((err) => {
                     res.json({message: `Error: ${err}`});
                 });
+                //req.session.user.isLoggedOn = true
             }
             else{
                 res.json({message:`ERROR: ${err} !`});
             }
-  
         })
         .catch(err=>{ // error in case password is wrong
             res.json({message:`ERROR: ${err} !`})
@@ -169,6 +169,7 @@ const addNewAuction = (data,res) => {
             res.json({message:`AUCTION ALREADY ADDED `});
         }
     })
+    .catch(err=>console.log(`Error:Auction not found ${err}`));
 }
 
 const getSpecificUserWithDetails = (req, res) => {
@@ -205,6 +206,108 @@ const addCreditCard = (data, res) => {
     })
 }
 
+
+const updateUser = (data, userID, res) => {
+    User.findById(userID)
+    .then((user)=>
+    {
+        user.address.streetName = data.streetName
+        user.address.streetNumber = data.streetNumber
+        user.address.city = data.city
+        user.address.postalCode = data.postalCode
+        user.address.country = data.country
+        user.firstName = data.firstName
+        user.lastName = data.lastName
+        user.password = data.password
+        
+        User.findOne({emailAddress: data.emailAddress}) // CHECK IN DATABASE IF AN EMAIL ALREADY EXISTS
+        .then(userForEmail=>
+        {
+            if(userForEmail == null) // if email does not exists, then go check if username exists
+            {
+                user.emailAddress = data.emailAddress
+                user.save()
+                .then(() => {
+                    res.json({message:`USER UPDATED SUCCESSFULLY !`, user: user})
+                })
+                .catch((err) => {
+                    res.json({message: `Error: ${err}`});
+                });
+            }
+
+        })
+        .catch((err) => {
+            res.json({message: `Error: ${err}`});
+        });
+
+    })
+}
+
+//Get user auctions
+const getUserAuctions = (req, res) => {
+    User.findOne({emailAddress: req.query.emailAddress})
+    .then(user => {
+        if(user.currentSessionKey != req.query.sessionId){
+            res.json({message: "Your session key is invalid"});
+        }
+        else{
+                res.json({
+                    user: user
+                })
+            }
+    })    
+    .catch(err=>console.log(`Error with User call: ${err}`));
+}
+
+//PUT auction to users auctions list
+const auctionAddToUSerList = (req, res) => {
+    //console.log(req.query.id, req.query.emailAddress)
+   Auction.findOne({_id: req.query.id})
+   .then( auction => {
+       User.findOne({emailAddress: req.query.emailAddress})
+       .then(user => {
+           
+           //add data from user to auction object 
+           auction.userList.push({
+               userName: user.userName, 
+               emailAddress: user.emailAddress})
+        
+           //add data from auction to user object 
+           user.manageAuction.push({
+               auctionName: auction.title,
+               productName: auction.product.name,
+               auctionStatus: auction.status
+            })
+
+            auction.save()
+            .then(()=> console.log("success"))
+            .catch(err=>console.log(`ERROR: Did not succeded: ${err}`));
+
+            user.save()
+            .then(()=> console.log("success"))
+            .catch(err=>console.log(`ERROR: Did not succeded: ${err}`));
+           res.json({auction: auction, user: user})
+       })
+       .catch(err=>console.log(`ERROR: Could not find user: ${err}`));
+   })
+   .catch(err=>console.log(`ERROR: Could not find auction: ${err}`));
+}
+
+
+//POST user auction problem - reportAuctionProblem
+// const reportAuctionProblem = (data, res) => {
+//     let problem = new AuctionProblem(data);
+//     problem.save()
+//     .then(() => {
+//         console.log("Problem submitted")
+//         res.json({message: "Success"})
+//     })
+//     .catch((err) => {
+//         console.log(err);
+//         res.json({message: "ERROR"})
+//     })
+// }
+
 module.exports = {
     initialize: initialize,
     addNewUser: addNewUser,
@@ -213,5 +316,8 @@ module.exports = {
     getAllAuctions : getAllAuctions,
     addNewAuction: addNewAuction,
     addCreditCard: addCreditCard,
-    getSpecificUserWithDetails: getSpecificUserWithDetails
+    updateUser: updateUser, 
+    getSpecificUserWithDetails: getSpecificUserWithDetails,
+    getUserAuctions : getUserAuctions,
+    auctionAddToUSerList : auctionAddToUSerList
 }
