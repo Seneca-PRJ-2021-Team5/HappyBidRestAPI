@@ -129,6 +129,10 @@ app.post("/api/user/recover/:email",(req,res)=>{
     dataService.accountRecover(req,res);
 })
 
+app.put("/api/user/update",(req,res)=>{
+    dataService.updateUser(req,res)
+})
+
 
 //--------------------------------------------------------
 

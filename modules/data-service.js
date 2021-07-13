@@ -263,25 +263,32 @@ const addCreditCard = (data, res) => {
 }
 
 
-const updateUser = (data, userID, res) => {
-    User.findById(userID)
+const updateUser = (req, res) => {
+    User.findById(req.body.id)
     .then((user)=>
     {
-        user.address.streetName = data.streetName
-        user.address.streetNumber = data.streetNumber
-        user.address.city = data.city
-        user.address.postalCode = data.postalCode
-        user.address.country = data.country
-        user.firstName = data.firstName
-        user.lastName = data.lastName
-        user.password = data.password
+        user.address.streetName = req.body.streetName
+        user.address.streetNumber = req.body.streetNumber
+        user.address.city = req.body.city
+        user.address.postalCode = req.body.postalCode
+        user.address.country = req.body.country
+        user.firstName = req.body.firstName
+        user.lastName = req.body.lastName
+
+        if(req.body.password != user.password)
+        {
+            let salt = bcrypt.genSaltSync(10);
+            let hash = bcrypt.hashSync(data.password, salt);
+    
+            user.password = hash
+        }
         
-        User.findOne({emailAddress: data.emailAddress}) // CHECK IN DATABASE IF AN EMAIL ALREADY EXISTS
+        User.findOne({emailAddress: req.body.emailAddress}) // CHECK IN DATABASE IF AN EMAIL ALREADY EXISTS
         .then(userForEmail=>
         {
             if(userForEmail == null) // if email does not exists, then go check if username exists
             {
-                user.emailAddress = data.emailAddress
+                user.emailAddress = req.body.emailAddress
                 user.save()
                 .then(() => {
                     console.log(chalk.magenta(`User Updated:`),chalk.green(` User was updated in database!`));
@@ -467,19 +474,6 @@ const accountRecover = (req,res) =>{
 
 
 
-//POST user auction problem - reportAuctionProblem
-// const reportAuctionProblem = (data, res) => {
-//     let problem = new AuctionProblem(data);
-//     problem.save()
-//     .then(() => {
-//         console.log("Problem submitted")
-//         res.json({message: "Success"})
-//     })
-//     .catch((err) => {
-//         console.log(err);
-//         res.json({message: "ERROR"})
-//     })
-// }
 
 module.exports = {
     initialize: initialize,
