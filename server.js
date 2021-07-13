@@ -125,6 +125,10 @@ app.post("/api/user/auction", (req, res) =>{
     dataService.auctionAddToUSerList(req, res);
 })
 
+app.post("/api/user/recover/:email",(req,res)=>{
+    dataService.accountRecover(req,res);
+})
+
 
 //--------------------------------------------------------
 

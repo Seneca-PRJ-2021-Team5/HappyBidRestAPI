@@ -409,6 +409,62 @@ const auctionAddToUSerList = (req, res) => {
 }
 
 
+// POST Recover account req.params
+const accountRecover = (req,res) =>{
+    console.log(req.params.email)
+    User.findOne({emailAddress: req.params.email})
+    .then((user)=>{
+
+        let new_password = crypto.randomBytes(8).toString('hex');
+
+        let salt = bcrypt.genSaltSync(10);
+        let hash = bcrypt.hashSync(new_password, salt);
+        user.password = hash
+
+        user.save()
+        .then(()=>
+        {
+            console.log(chalk.magenta(`Password Change:`),chalk.green(`Password changed and persisted to database!`));
+            console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+
+            const send = require('gmail-send')(
+            {
+                user: process.env.MAIL_FROM,
+                pass: process.env.MAIL_PASSWORD,
+                to:   req.params.email,
+                subject: `HappyBidding - Password Change`,
+                text:    `Hello ${user.firstName} ${user.lastName}\nHere is your new password: ${new_password}\nPlease, login with it and change it in your profile overview page!\n\nRegards from HappyBidding Team!`
+            });
+    
+            send()
+            .then(()=>
+            {
+                console.log(chalk.magenta(`Email Confirmation:`),chalk.green(`Email Sent to recovery!`));
+                console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+            })
+            .catch((err)=>{
+                console.log(chalk.magenta(`Email Confirmation:`),chalk.red(` ERROR: ${err}`));
+                console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+            });
+
+            // DO RES.JSON ------------------------------------------
+
+        })
+        .catch((err)=>{
+            console.log(chalk.magenta(`Password Change:`),chalk.red(` ERROR: ${err}`));
+            console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+        });
+
+    })
+    .catch(()=>{
+        res.json({message:"ERROR: USER NOT FOUND"})
+        console.log(chalk.magenta(`User Not Found:`),chalk.red(` USER DOES NOT EXISTS IN THE DATABASE !`));
+        console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+    })
+}
+
+
+
 //POST user auction problem - reportAuctionProblem
 // const reportAuctionProblem = (data, res) => {
 //     let problem = new AuctionProblem(data);
@@ -434,5 +490,6 @@ module.exports = {
     updateUser: updateUser, 
     getSpecificUserWithDetails: getSpecificUserWithDetails,
     getUserAuctions : getUserAuctions,
-    auctionAddToUSerList : auctionAddToUSerList
+    auctionAddToUSerList : auctionAddToUSerList,
+    accountRecover: accountRecover
 }
