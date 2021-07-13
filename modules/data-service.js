@@ -283,31 +283,36 @@ const updateUser = (req, res) => {
             user.password = hash
         }
         
-        User.findOne({emailAddress: req.body.emailAddress}) // CHECK IN DATABASE IF AN EMAIL ALREADY EXISTS
-        .then(userForEmail=>
+        if(user.emailAddress != req.body.emailAddress)
         {
-            if(userForEmail == null) // if email does not exists, then go check if username exists
+            User.findOne({emailAddress: req.body.emailAddress}) // CHECK IN DATABASE IF AN EMAIL ALREADY EXISTS
+            .then(userForEmail=>
             {
-                user.emailAddress = req.body.emailAddress
-                user.save()
-                .then(() => {
-                    console.log(chalk.magenta(`User Updated:`),chalk.green(` User was updated in database!`));
-                    console.log(chalk.blue(`------------------------------------------------------------------------------------`));
-                    res.json({message:`USER UPDATED SUCCESSFULLY !`})
-                })
-                .catch((err) => {
-                    console.log(chalk.magenta(`User Update:`),chalk.red(` ERROR ${err}`));
-                    console.log(chalk.blue(`------------------------------------------------------------------------------------`));
-                    res.json({message:`ERROR: ${err} !`}); 
-                });
-            }
+                if(userForEmail == null) // if email does not exists, then go check if username exists
+                {
+                    user.emailAddress = req.body.emailAddress
+                }
 
+            })
+            .catch((err) => {
+                console.log(chalk.magenta(`User Update:`),chalk.red(` ERROR ${err}`));
+                console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+                //res.json({message:`ERROR: ${err} !`}); 
+            });
+        }
+
+        user.save()
+        .then(() => {
+            console.log(chalk.magenta(`User Updated:`),chalk.green(` User was updated in database!`));
+            console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+            res.json({message:`USER UPDATED SUCCESSFULLY !`})
         })
         .catch((err) => {
             console.log(chalk.magenta(`User Update:`),chalk.red(` ERROR ${err}`));
             console.log(chalk.blue(`------------------------------------------------------------------------------------`));
             res.json({message:`ERROR: ${err} !`}); 
         });
+        
 
     })
 }
