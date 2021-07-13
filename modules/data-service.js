@@ -66,6 +66,28 @@ const addNewUser = (data, res)=> {
                     res.json({message:`ERROR: ${err} !`}); 
                 })
 
+                // Send an Email confirmation
+                const send = require('gmail-send')(
+                {
+                    user: process.env.MAIL_FROM,
+                    pass: process.env.MAIL_PASSWORD,
+                    to:   data.emailAddress,
+                    subject: `HappyBidding - Sign Up Confirmation`,
+                    text:    `Hello ${data.emailAddress}\nThis is a friendly confirmation that you have successfully signed up!\n\nRegards from HappyBidding Team!`
+                });
+        
+                send()
+                .then(()=>
+                {
+                    console.log(chalk.magenta(`Email Confirmation:`),chalk.green(`Email Sent to recovery!`));
+                    console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+                })
+                .catch((err)=>{
+                    console.log(chalk.magenta(`Email Confirmation:`),chalk.red(` ERROR: ${err}`));
+                    console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+                });
+                // -------------
+
                 console.log(chalk.magenta(`User registration:`),chalk.green(` Registration completed and database's document created!`));
                 console.log(chalk.blue(`------------------------------------------------------------------------------------`));
                 res.json({message:`USER REGISTERED SUCCESSFULLY !`})
