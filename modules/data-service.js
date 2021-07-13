@@ -51,6 +51,21 @@ const addNewUser = (data, res)=> {
             newUser.save()
             .then(() =>
             {                  
+                
+                let newCard = new CreditCard({
+                    userEmail: data.emailAddress
+                });
+                newCard.save()
+                .then(() => {
+                    console.log(chalk.magenta(`CREDIT CARD ADDED:`),chalk.green(` New Credit Card was added in database!`));
+                    console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+                })
+                .catch((err) => {
+                    console.log(chalk.magenta(`New Credit Card:`),chalk.red(` ERROR ${err}`));
+                    console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+                    res.json({message:`ERROR: ${err} !`}); 
+                })
+
                 console.log(chalk.magenta(`User registration:`),chalk.green(` Registration completed and database's document created!`));
                 console.log(chalk.blue(`------------------------------------------------------------------------------------`));
                 res.json({message:`USER REGISTERED SUCCESSFULLY !`})
@@ -61,6 +76,8 @@ const addNewUser = (data, res)=> {
                 console.log(chalk.blue(`------------------------------------------------------------------------------------`));
                 res.json({message:`ERROR: ${err} !`});
             })
+
+            
 
         }
         else {
