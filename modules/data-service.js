@@ -6,6 +6,7 @@ const app = express();
 const chalk = require('chalk'); // to style console.log texts
 // const keys = require("./keys.js");
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const User = require("../Models/userSchema");
 const CreditCard = require("../Models/creditCardSchema");
@@ -133,7 +134,7 @@ const getSpecificUser =(req, res)=>
             {
                 // passwords match
                 // create session id key
-                const crypto = require('crypto');
+                
                 let sess_id = crypto.randomBytes(20).toString('hex');
 
                 user.currentSessionKey = sess_id;
@@ -414,7 +415,7 @@ const accountRecover = (req,res) =>{
     console.log(req.params.email)
     User.findOne({emailAddress: req.params.email})
     .then((user)=>{
-
+        console.log("hello")
         let new_password = crypto.randomBytes(8).toString('hex');
 
         let salt = bcrypt.genSaltSync(10);
@@ -433,7 +434,7 @@ const accountRecover = (req,res) =>{
                 pass: process.env.MAIL_PASSWORD,
                 to:   req.params.email,
                 subject: `HappyBidding - Password Change`,
-                text:    `Hello ${user.firstName} ${user.lastName}\nHere is your new password: ${new_password}\nPlease, login with it and change it in your profile overview page!\n\nRegards from HappyBidding Team!`
+                text:    `Hello ${user.emailAddress} \nHere is your new password: ${new_password}\nPlease, login with it and change it in your profile overview page!\n\nRegards from HappyBidding Team!`
             });
     
             send()
@@ -441,6 +442,7 @@ const accountRecover = (req,res) =>{
             {
                 console.log(chalk.magenta(`Email Confirmation:`),chalk.green(`Email Sent to recovery!`));
                 console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+                res.json({message: "Password changed"})
             })
             .catch((err)=>{
                 console.log(chalk.magenta(`Email Confirmation:`),chalk.red(` ERROR: ${err}`));
