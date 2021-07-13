@@ -130,6 +130,7 @@ app.post("/api/user/recover/:email",(req,res)=>{
 })
 
 app.put("/api/user/update",(req,res)=>{
+    console.log("GOT IN THE PUT ROUTE: ")
     dataService.updateUser(req,res)
 })
 

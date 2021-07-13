@@ -264,6 +264,7 @@ const addCreditCard = (data, res) => {
 
 
 const updateUser = (req, res) => {
+    console.log(req.body)
     User.findById(req.body.id)
     .then((user)=>
     {
@@ -282,7 +283,7 @@ const updateUser = (req, res) => {
     
             user.password = hash
         }
-        
+
         if(user.emailAddress != req.body.emailAddress)
         {
             User.findOne({emailAddress: req.body.emailAddress}) // CHECK IN DATABASE IF AN EMAIL ALREADY EXISTS
