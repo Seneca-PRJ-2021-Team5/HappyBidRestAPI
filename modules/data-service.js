@@ -278,8 +278,9 @@ const updateUser = (req, res) => {
 
         if(req.body.password != user.password)
         {
+            console.log("NOT EQUAL PASSWORDS!!!")
             let salt = bcrypt.genSaltSync(10);
-            let hash = bcrypt.hashSync(data.password, salt);
+            let hash = bcrypt.hashSync(req.body.password, salt);
     
             user.password = hash
         }
