@@ -479,7 +479,24 @@ const accountRecover = (req,res) =>{
     })
 }
 
-
+const reportProblem=(data, auctionId,res)=>
+{   
+    Auction.findOne({_id: auctionId})
+   .then( auction => {
+        if(auction != null)
+        {
+            auction.problemList.push({
+                userFirstName: data.userInfo.firstName,
+                userLastName: data.userInfo.lastName,
+                userEmailAddress: data.userInfo.emailAddress,
+                problemDescription: data.problemDescription,
+                reportDate: Date()
+            })
+            
+            auction.save()
+        }
+   })
+}
 
 
 module.exports = {
@@ -494,5 +511,6 @@ module.exports = {
     getSpecificUserWithDetails: getSpecificUserWithDetails,
     getUserAuctions : getUserAuctions,
     auctionAddToUSerList : auctionAddToUSerList,
-    accountRecover: accountRecover
+    accountRecover: accountRecover,
+    reportProblem:reportProblem
 }
