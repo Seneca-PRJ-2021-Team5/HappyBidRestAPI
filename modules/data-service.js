@@ -609,6 +609,22 @@ const updateAuction=(data, auctionId, res)=>
    })
 }
 
+const getAuctionById = (req, res) => {
+    Auction.findOne({_id: req.params.id})
+   .then( auction => {
+        if(auction != null)
+        {
+            res.json({
+                auction: auction
+            })
+        }
+   })
+   .catch(err=>{
+        console.log(chalk.magenta(`Auction Not Found:`),chalk.red(` ERROR ${err}`));
+        console.log(chalk.blue(`------------------------------------------------------------------------------------`));
+        res.json({message:`ERROR: ${err} !`});    
+    });
+}
 
 module.exports = {
     initialize: initialize,
@@ -626,5 +642,6 @@ module.exports = {
     reportProblem:reportProblem,
     replyProblem: replyProblem,
     deleteAuction: deleteAuction,
-    updateAuction: updateAuction
+    updateAuction: updateAuction,
+    getAuctionById: getAuctionById
 }
