@@ -156,6 +156,11 @@ app.post("/api/auction/:id", (req,res) => {
     dataService.updateAuction(req.body, req.params.id, res)
 });
 
+// ROUTE 404 - route not found
+app.use((req, res) => {
+    res.status(404).json({ error: "Request failed with status code 404" });
+  });
+
 //--------------------------------------------------------
 
 // ------------------- CONNECTIVITY PART
