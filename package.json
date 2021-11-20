@@ -4,7 +4,7 @@
   "description": "This is the final project for PRJ666",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "author": "Team 12",
   "license": "ISC",
@@ -19,6 +19,7 @@
     "gmail-send": "^1.8.10",
     "mongodb": "^3.6.9",
     "mongoose": "^5.12.12",
+    "nodemon": "^2.0.15",
     "socket.io": "^4.1.2"
   }
 }
